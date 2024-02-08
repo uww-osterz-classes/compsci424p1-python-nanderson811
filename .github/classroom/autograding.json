@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "p1CreateOneV1",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\nend\r\n",
+      "output": "((Process 0.*:.*child.*1[\\s]*)|(Process 1:.*parent is 0 and ((has no children)|(child.*empty))[\\s]*)){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 3
+    },
+    {
+      "name": "p1CreateOneV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\nend\r\n",
+      "output": "(((Process 0.*:.*child.*1[\\s]*)|(Process 1:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){2}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 2
+    }
+  ]
+}
