@@ -19,6 +19,106 @@
       "comparison": "regex",
       "timeout": 2,
       "points": 2
+    },
+    {
+      "name": "p1CreateSimpleV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 1\r\nend\r\n",
+      "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and child.*((is)|(are))[\\s]*3[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 3.*:.*parent is[\\s]*1[\\s]*and ((has no children)|(child.*empty))[\\s]*)){4}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 2
+    },
+    {
+      "name": "p1CreateSimpleV2",
+      "setup": "",
+      "run": "python3 prog1.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 1\r\nend\r\n",
+      "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and child.*((is)|(are))[\\s]*3[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 3.*:.*parent is[\\s]*1[\\s]*and ((has no children)|(child.*empty))[\\s]*)){4}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 2
+    },
+    {
+      "name": "p1CreateComplexV1",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 2\r\ncreate 0\r\ncreate 2\r\ncreate 5\r\nend\r\n",
+      "output": "((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and children are[\\s]*3[\\s]*5[\\s]*)|(Process 3.*:.*parent is[\\s]*2[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 5.*:.*parent is[\\s]*2[\\s]*and child.*((is)|(are))[\\s]*6[\\s]*)|(Process 6.*:.*parent is[\\s]*5[\\s]*and ((has no children)|(child.*empty))[\\s]*)){7}",
+      "comparison": "regex",
+      "timeout": 3,
+      "points": 3
+    },
+    {
+      "name": "p1CreateComplexV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 2\r\ncreate 0\r\ncreate 2\r\ncreate 5\r\nend\r\n",
+      "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and children are[\\s]*3[\\s]*5[\\s]*)|(Process 3.*:.*parent is[\\s]*2[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 5.*:.*parent is[\\s]*2[\\s]*and child.*((is)|(are))[\\s]*6[\\s]*)|(Process 6.*:.*parent is[\\s]*5[\\s]*and ((has no children)|(child.*empty))[\\s]*)){7}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 3,
+      "points": 2
+    },
+    {
+      "name": "p1DestroyNoChildV1",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ndestroy 1\r\nend\r\n",
+      "output": "((Process 0.*:.*child.*1[\\s]*)|(Process 1:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){2}[\\S\\s]*(Process 0.*:.*((has no children)|(child.*empty)))",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 3
+    },
+    {
+      "name": "p1DestroyNoChildV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ndestroy 1\r\nend\r\n",
+      "output": "(((Process 0.*:.*child.*1[\\s]*)|(Process 1:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){2}[\\S\\s]*(Process 0.*:.*((has no children)|(child.*empty)))[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 2
+    },
+    {
+      "name": "p1DestroyOneChildV1",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 1\r\ndestroy 1\r\ndestroy 2\r\nend\r\n",
+      "output": "((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and child.*((is)|(are))[\\s]*3[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 3.*:.*parent is[\\s]*1[\\s]*and ((has no children)|(child.*empty))[\\s]*)){4}[\\S\\s]*((Process 0.*:.*child.*((is)|(are))[\\s]*2[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 3
+    },
+    {
+      "name": "p1DestroyOneChildV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 1\r\ndestroy 1\r\ndestroy 2\r\nend\r\n",
+      "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and child.*((is)|(are))[\\s]*3[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 3.*:.*parent is[\\s]*1[\\s]*and ((has no children)|(child.*empty))[\\s]*)){4}[\\S\\s]*((Process 0.*:.*child.*((is)|(are))[\\s]*2[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){2}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 2,
+      "points": 2
+    },
+    {
+      "name": "p1DestroyHierarchyV1",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 2\r\ncreate 0\r\ncreate 2\r\ncreate 5\r\ndestroy 2\r\ndestroy 4\r\ndestroy 1\r\nend\r\n",
+      "output": "((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and children are[\\s]*3[\\s]*5[\\s]*)|(Process 3.*:.*parent is[\\s]*2[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 5.*:.*parent is[\\s]*2[\\s]*and child.*((is)|(are))[\\s]*6[\\s]*)|(Process 6.*:.*parent is[\\s]*5[\\s]*and ((has no children)|(child.*empty))[\\s]*)){7}[\\S\\s]*((Process 0.*:.*children are[\\s]*1[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){3}",
+      "comparison": "regex",
+      "timeout": 3,
+      "points": 3
+    },
+    {
+      "name": "p1DestroyHierarchyV2",
+      "setup": "",
+      "run": "python3 p1main.py",
+      "input": "create 0\r\ncreate 0\r\ncreate 2\r\ncreate 0\r\ncreate 2\r\ncreate 5\r\ndestroy 2\r\ndestroy 4\r\ndestroy 1\r\nend\r\n",
+      "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and children are[\\s]*3[\\s]*5[\\s]*)|(Process 3.*:.*parent is[\\s]*2[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 5.*:.*parent is[\\s]*2[\\s]*and child.*((is)|(are))[\\s]*6[\\s]*)|(Process 6.*:.*parent is[\\s]*5[\\s]*and ((has no children)|(child.*empty))[\\s]*)){7}[\\S\\s]*((Process 0.*:.*children are[\\s]*1[\\s]*4[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 4.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)){3}[\\S\\s]*){2}",
+      "comparison": "regex",
+      "timeout": 3,
+      "points": 2
     }
   ]
 }
