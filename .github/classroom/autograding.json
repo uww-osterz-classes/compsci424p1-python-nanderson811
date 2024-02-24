@@ -21,14 +21,14 @@
       "points": 2
     },
     {
-      "name": "p1CreateSimpleV2",
+      "name": "p1CreateSimpleV1",
       "setup": "",
       "run": "python3 p1main.py",
       "input": "create 0\r\ncreate 0\r\ncreate 1\r\nend\r\n",
       "output": "(((Process 0.*:.*children are[\\s]*1[\\s]*2[\\s]*)|(Process 1.*:.*parent is[\\s]*0[\\s]*and child.*((is)|(are))[\\s]*3[\\s]*)|(Process 2.*:.*parent is[\\s]*0[\\s]*and ((has no children)|(child.*empty))[\\s]*)|(Process 3.*:.*parent is[\\s]*1[\\s]*and ((has no children)|(child.*empty))[\\s]*)){4}[\\S\\s]*){2}",
       "comparison": "regex",
       "timeout": 2,
-      "points": 2
+      "points": 3
     },
     {
       "name": "p1CreateSimpleV2",
