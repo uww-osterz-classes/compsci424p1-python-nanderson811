@@ -1,271 +1,240 @@
 # Noah Anderson
 
+v1_pcb = []
+v2_pcb = []
+
 import time
 
+class V1PCB:
+    def __init__(self, parent=None):
+        self.__children = []
+        self.__parent = parent
 
-class PCBV1:
-    generated_pid = 0
+    def get_parent(self):
+        return self.__parent
 
-    # constructor, default parent is set to None for the root PCB
-    def __init__(self, pid, parent=None):
-        self.pid = pid
-        self.children = []
-        self.parent = parent
+    def get_children(self):
+        return self.__children
 
-    @staticmethod
-    def generate_pid():
-        PCBV1.generated_pid += 1
-        return PCBV1.generated_pid
+    def add_child(self, child):
+        self.__children.append(child)
 
-    # creates a process and assigns a parent to it, and becomes a child of that parent process
-    def create(self, parent_pid):
-        pid = self.generate_pid()
-        parent = self.find_process(parent_pid)
-        if parent:
-            child = PCBV1(pid, parent)
-            parent.children.append(child)
-            return child
-        else:
-            print("Parent \"" + str(parent_pid) + "\" not found.")
-            return None
-
-    # recursively destroys the children of the target_pid then removes itself from the PCB
-    def destroy(self, target_pid):
-        process = self.find_process(target_pid)
-        if process:
-            for child in process.children:
-                if len(child.children) == 0:
-                    child.parent.children.remove(child)
-                    return
-                else:
-                    child.destroy(child.pid)
-            process.parent.children.remove(process)
-        else:
-            print("Process \"" + str(target_pid) + "\" not found.")
-
-    # navigates to root node, then searches the PCB tree
-    def find_process(self, pid):
-        process = self
-        while process.parent:
-            process = process.parent
-
-        return process.search_tree(process, pid)
-
-    # function to search the PCB tree for the target PID
-    def search_tree(self, process, target):
-        if process.pid == target:
-            return process
-
-        for child in process.children:
-            child_process = self.search_tree(child, target)
-            if child_process:
-                return child_process
-
-        return None
-
-    def showProcessInfo(self):
-        children_info = ""
-        if len(self.children) != 0:
-            children_str = ""
-            for child in self.children:
-                children_str += str(child.pid) + " "
-                if len(child.children) == 0:
-                    return "Process " + str(child.pid) + ": parent is " + str(child.parent.pid) + " and has no children"
-                else:
-                    children_info += child.showProcessInfo() + "\n"
-            if self.parent is None:
-                return "Process " + str(self.pid) + ": parent is -1 and children are " + children_str
-            else:
-                return "Process " + str(self.pid) + ": parent is " \
-                                                    "" + str(self.parent.pid) + " and children are " + children_str
-        else:
-            if self.parent is None:
-                return "Process " + str(self.pid) + ": parent is -1 and has no children"
-            else:
-                return "Process " + str(self.pid) + ": parent is " + str(self.parent.pid) + " and has no children"
+    def remove_child(self, child):
+        self.__children.remove(child)
 
 
-class PCBV2:
-    generated_pid = 0
-
-    def __init__(self, pid, parent=None, older_sibling=None):
-        self.pid = pid
-        self.parent = parent
-        self.first_child = None
-        self.older_sibling = older_sibling
-        self.younger_sibling = None
-
-    @staticmethod
-    def generate_pid():
-        PCBV1.generated_pid += 1
-        return PCBV1.generated_pid
+class V1PCBArray:
+    def __init__(self, pcb_array):
+        self.__pcb_array = pcb_array
 
     def create(self, parent_pid):
-        pid = self.generate_pid()
-        process = self.find_process(parent_pid)
-        if process:
-            if process.first_child is None:
-                child = PCBV2(pid, process)
-                return child
-            else:
-                older_sibling = process.first_child
-                while older_sibling.younger_sibling is not None:
-                    older_sibling = older_sibling.younger_sibling
-                child = PCBV2(pid, process, older_sibling)
-                older_sibling.younger_sibling = child
-                return child
+        if len(self.__pcb_array) == 0:
+            new_process = V1PCB(-1)
+            self.__pcb_array.append(new_process)
         else:
-            print("Parent \"" + str(parent_pid) + "\" not found.")
-            return None
+            new_process = V1PCB(parent_pid)
+            self.__pcb_array.append(new_process)
+            self.__pcb_array[new_process.get_parent()].add_child(self.__pcb_array.index(new_process))
 
     def destroy(self, target_pid):
-        process = self.find_process(target_pid)
-        if process and not process.parent:
-            if process.first_child is None:
-                process.older_sibling.younger_sibling = process.younger_sibling
-            else:
-                process.destroy(process.first_child.pid)
-        else:
-            print("Process \"" + str(target_pid) + "\" not found.")
-            return None
-
-        # destroys all siblings/children of target_pid by removing all references to the process
-        if process.parent:
-            if process.first_child is None:
-                process.parent = None
-            if process.younger_sibling is None:
-                return None
-            else:
-                process.destroy(process.first_child.pid)
-
-    # function to find if a process id is present within the PCB
-    def find_process(self, pid):
-        # case if PCB is empty
-        if self is None:
-            return None
-
-        # case if current node is the target PID
-        if self.pid == pid:
-            return self
-
-        # if node has a parent, traverses up the PCB tree until the root node
-        if self.parent:
-            return self.parent.find_process(pid)
-
-        # checks older sibling recursively (if one exists) for target PID
-        process = self.older_sibling.find_process(pid) if self.older_sibling else None
-        if process:
-            return process
-
-        # checks younger sibling recursively (if one exists) for target PID
-        process = self.younger_sibling.find_process(pid) if self.younger_sibling else None
-        if process:
-            return process
-
-        # checks first child recursively (if one exists) for target PID
-        process = self.first_child.find_process(pid) if self.first_child else None
-        if process:
-            return process
-
-        return None
-
-    def show_process_info_root(self):
-        current_process = self
-        while current_process.parent:
-            current_process = current_process.parent
-
-        return current_process.showProcessInfo()
+        for child in self.__pcb_array[target_pid].get_children():
+            child_process = self.__pcb_array[child]
+            self.destroy(self.__pcb_array.index(child_process))
+            self.__pcb_array.remove(child_process)
 
     def showProcessInfo(self):
-        message = ""
-        if self.parent is None:
-            message = "Process " + str(self.pid) + ": parent is -1 and children are "
-            children_string = "empty"
-            if self.first_child:
-                children_string = str(self.first_child.pid) + " "
-                child = self.first_child
-                while child.younger_sibling:
-                    children_string += str(child.younger_sibling.pid) + " "
-                    child = child.younger_sibling
-            message += children_string + "\n"
-            if self.first_child:
-                message += self.first_child.showProcessInfo()
-            return message
-        else:
-            message += "Process " + str(self.pid) + ": parent is " + str(self.parent.pid) + " and children are "
-            children_string = "empty"
-            if self.first_child:
-                children_string = str(self.first_child.pid) + " "
-                child = self.first_child
-                while child.younger_sibling:
-                    children_string += str(child.younger_sibling.pid) + " "
-                    child = child.younger_sibling
-            message += children_string + "\n"
-            if self.younger_sibling:
-                message += self.younger_sibling.showProcessInfo()
-            elif self.first_child:
-                message += self.first_child.showProcessInfo()
+        index = 0
+        for process in self.__pcb_array:
+            output_str = ""
+            output_str += "Process: " + str(index) + ": parent is "
+            output_str += str(process.get_parent()) + " and children are "
+            if len(process.get_children()) == 0:
+                output_str += "empty"
             else:
-                return message
+                for x in process.get_children():
+                    output_str += str(x) + " "
+            print(output_str)
+            index += 1
 
 
-# Command sequence storage
-command_sequence = []
 
-# Accepting commands
-while True:
-    command = input("Enter command (create N, destroy N, or end): ").strip().lower()
-    if command == "end" or not command.startswith(("create", "destroy")):
-        break
-    else:
+class V2PCB:
+    def __init__(self, parent=None):
+        self.__parent = parent
+        self.__child = None
+        self.__older_sibling = None
+        self.__younger_sibling = None
+
+    def get_parent(self):
+        return self.__parent
+
+    def get_first_child(self):
+        return self.__child
+
+    def get_younger_sibling(self):
+        return self.__younger_sibling
+
+    def get_older_sibling(self):
+        return self.__older_sibling
+
+    def set_first_child(self, child):
+        self.__child = child
+
+    def set_older_sibling(self, older_sibling):
+        self.__older_sibling = older_sibling
+
+    def set_younger_sibling(self, younger_sibling):
+        self.__younger_sibling = younger_sibling
+
+
+class V2PCBArray:
+    def __init__(self, pcb_array):
+        self.__pcb_array = pcb_array
+
+    def create(self, parent_pid):
         try:
-            action, number = command.split()
-            if action == "create":
-                number = int(number)
-            command_sequence.append((action, number))
-        except ValueError:
-            print("Invalid command. Please enter commands in the format 'create N' or 'destroy N'.")
+            if len(self.__pcb_array) < parent_pid-1:
+                print("Error: Parent Process ID Not found, create command cancelled.")
+                return
 
-# Creating objects
-v1 = PCBV1(1)
-v2 = PCBV2(1)
+            if len(self.__pcb_array) == 0:
+                new_process = V2PCB(-1)
+            else:
+                new_process = V2PCB(parent_pid)
 
-# Running command sequence once for each version
-for action in command_sequence:
-    cmd, n = action
-    if cmd == "create":
-        v1.create(n)
-        v2.create(n)
-    elif cmd == "destroy":
-        v1.destroy(n)
-        v2.destroy(n)
-    print("Version 1:")
-    # v1.showProcessInfo()
-    print("Version 2:")
-    v2.show_process_info_root()
+            self.__pcb_array.append(new_process)
 
-    # Running command sequence 200 times for Version 1
-start_time_v1 = time.time()
-for _ in range(200):
-    for action in command_sequence:
-        cmd, n = action
-        if cmd == "create":
-            v1.create(n)
-        elif cmd == "destroy":
-            v1.destroy(n)
-end_time_v1 = time.time()
-v1_running_time = end_time_v1 - start_time_v1
-print(f"Version 1 running time: {v1_running_time} seconds")
+            if len(self.__pcb_array) == 1:
+                return
 
-# Running command sequence 200 times for Version 2
-start_time_v2 = time.time()
-for _ in range(200):
-    for action in command_sequence:
-        cmd, n = action
-        if cmd == "create":
-            v2.create(n)
-        elif cmd == "destroy":
-            v2.destroy(n)
-end_time_v2 = time.time()
-v2_running_time = end_time_v2 - start_time_v2
-print(f"Version 2 running time: {v2_running_time} seconds")
+            if parent_pid < 0:
+                return
+            else:
+                pid = self.__pcb_array.index(new_process)
+                process_parent = self.__pcb_array[new_process.get_parent()]
+
+            if process_parent.get_first_child() is None:
+                process_parent.set_first_child(pid)
+            else:
+                current_child = self.__pcb_array[process_parent.get_first_child()]
+                while current_child.get_younger_sibling() is not None:
+                    current_child = current_child.get_younger_sibling()
+
+                current_child.set_younger_sibling(pid)
+                new_process.set_older_sibling(self.__pcb_array.index(current_child))
+        except IndexError:
+            print("Error: Parent process not found, create command skipped.")
+
+    def destroy(self, target_pid, is_child=0):
+        target_process = self.__pcb_array[target_pid]
+
+        parent = self.__pcb_array[target_process.get_parent()]
+
+        if target_process.get_first_child() is not None:
+            child_process = self.__pcb_array[target_process.get_first_child()]
+            child_process_index = self.__pcb_array.index(child_process)
+            self.destroy(child_process_index, 1)
+        if target_process.get_younger_sibling() is not None and is_child == 1:
+            younger_sibling_process = self.__pcb_array[target_process.get_younger_sibling()]
+            younger_sibling_index = self.__pcb_array.index(younger_sibling_process)
+            self.destroy(younger_sibling_index, 1)
+
+        if target_process.get_younger_sibling() is None:
+            new_first_child = None
+        else:
+            new_first_child = self.__pcb_array[target_process.get_younger_sibling()]
+
+        self.__pcb_array.pop(target_pid)
+
+        if new_first_child:
+            new_first_child.set_older_sibling(None)
+            parent.set_first_child(self.__pcb_array.index(new_first_child))
+        else:
+            parent.set_first_child(None)
+
+    def showProcessInfo(self):
+        index = 0
+        for process in self.__pcb_array:
+            output_str = ""
+            output_str += "Process: " + str(index) + ": parent is "
+            output_str += str(process.get_parent()) + " and children are "
+            if process.get_first_child() is None:
+                output_str += "empty"
+            else:
+                output_str += str(process.get_first_child()) + " "
+                current_child = self.__pcb_array[process.get_first_child()]
+                while current_child.get_younger_sibling() is not None:
+                    output_str += str(current_child.get_younger_sibling()) + " "
+                    current_child = self.__pcb_array[current_child.get_younger_sibling()]
+            print(output_str)
+            index += 1
+
+
+action_list = []
+userinput = input("Enter a command: ")
+while userinput.lower() != "end":
+    parsed_input = userinput.split()
+    try:
+        if parsed_input[0].lower() == "create":
+            create_action = ["create", int(parsed_input[1])]
+            action_list.append(create_action)
+            userinput = input("Enter a command: ")
+        elif parsed_input[0].lower() == "destroy":
+            destroy_action = ["destroy", int(parsed_input[1])]
+            action_list.append(destroy_action)
+            userinput = input("Enter a command: ")
+        else:
+            print("Error: Command not recognized")
+            userinput = input("Enter a command: ")
+    except ValueError:
+        print("Error: Command must be in format 'create/destroy x or end' where x is an integer")
+        userinput = input("Enter a command: ")
+
+v1 = V1PCBArray([])
+v2 = V2PCBArray([])
+print("Version 1\n")
+for x in action_list:
+    if x[0] == "create":
+        v1.create(x[1])
+    elif x[0] == "destroy":
+        v1.destroy(x[1])
+    v1.showProcessInfo()
+    print("\n\n")
+
+print("Version 2\n")
+for x in action_list:
+    if x[0] == "create":
+        v2.create(x[1])
+    elif x[0] == "destroy":
+        v2.destroy(x[1])
+    v2.showProcessInfo()
+    print("\n\n")
+
+start_time = time.time()
+
+for y in range(200):
+    v1 = V1PCBArray([])
+    for x in action_list:
+        if x[0] == "create":
+            v1.create(x[1])
+        elif x[0] == "destroy":
+            v1.destroy(x[1])
+
+end_time = time.time()
+v1.showProcessInfo()
+print("Elapsed time for Version 1: " + str(end_time-start_time) + " seconds")
+print("\n\n")
+
+start_time = time.time()
+for y in range(200):
+    v2 = V2PCBArray([])
+    for x in action_list:
+        if x[0] == "create":
+            v2.create(x[1])
+        elif x[0] == "destroy":
+            v2.destroy(x[1])
+
+end_time = time.time()
+v2.showProcessInfo()
+print("Elapsed time for Version 2: " + str(end_time-start_time) + " seconds")
+
